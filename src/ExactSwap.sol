@@ -5,6 +5,9 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IERC20.sol";
 
 contract ExactSwap {
+    error InsufficientOutput();
+    error InsufficientLiquidity();
+
     /**
      *  PERFORM AN SIMPLE SWAP WITHOUT ROUTER EXERCISE
      *
@@ -23,6 +26,27 @@ contract ExactSwap {
          *     data: leave it empty.
          */
 
-        // your code start here
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pool)
+            .getReserves();
+
+        IUniswapV2Pair(weth).transfer(
+            pool,
+            getAmountIn(1337e6, reserve1, reserve0)
+        );
+        IUniswapV2Pair(pool).swap(1337e6, 0, address(this), "");
+    }
+
+    function getAmountIn(
+        uint256 amountOut,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) internal pure returns (uint256) {
+        require(amountOut > 0, InsufficientOutput());
+        require(reserveIn > 0 && reserveOut > 0, InsufficientLiquidity());
+        require(reserveOut > amountOut, InsufficientLiquidity());
+
+        uint256 numerator = reserveIn * amountOut * 1000;
+        uint256 denominator = (reserveOut - amountOut) * 997;
+        return (numerator / denominator) + 1;
     }
 }

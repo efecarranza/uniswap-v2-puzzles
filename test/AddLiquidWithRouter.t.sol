@@ -12,7 +12,11 @@ contract AddLiquidWithRouterTest is Test {
     address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
 
     function setUp() public {
-        addLiquidWithRouterAddress = new AddLiquidWithRouter(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 21795025);
+
+        addLiquidWithRouterAddress = new AddLiquidWithRouter(
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        );
 
         // transfers 1 ETH to addLiquidWithRouterAddress
         vm.deal(address(addLiquidWithRouterAddress), 1 ether);

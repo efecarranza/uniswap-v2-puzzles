@@ -17,6 +17,7 @@ contract ArbitrageTest is Test {
     address public flashLenderPool = 0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
 
         myMevBot = new MyMevBot(flashLenderPool, weth, usdc, usdt, router);
@@ -27,9 +28,7 @@ contract ArbitrageTest is Test {
 
         vm.startPrank(address(0xBeeb));
         IUniswapV2Pair(usdt).transfer(ETH_USDT_pool, 3_000_000e6);
-
         IUniswapV2Pair(weth).transfer(ETH_USDT_pool, 10 ether);
-
         IUniswapV2Pair(ETH_USDT_pool).mint(address(0xB0b));
         vm.stopPrank();
     }

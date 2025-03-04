@@ -5,6 +5,9 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IERC20.sol";
 
 contract SimpleSwap {
+    error InsufficientInputAmount();
+    error InsufficientLiquidity();
+
     /**
      *  PERFORM A SIMPLE SWAP WITHOUT ROUTER EXERCISE
      *
@@ -23,6 +26,24 @@ contract SimpleSwap {
          *     data: leave it empty.
          */
 
-        // your code start here
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pool)
+            .getReserves();
+        uint256 amountOut = getAmountOut(0.1 ether, reserve1, reserve0);
+        IERC20(weth).transfer(pool, 0.1 ether);
+        IUniswapV2Pair(pool).swap(amountOut, 0, address(this), "");
+    }
+
+    function getAmountOut(
+        uint256 amountIn,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) internal pure returns (uint256) {
+        require(amountIn > 0, InsufficientInputAmount());
+        require(reserveIn > 0 && reserveOut > 0, InsufficientLiquidity());
+
+        uint256 amountInWithFee = amountIn * 997;
+        uint256 numerator = amountInWithFee * reserveOut;
+        uint256 denominator = reserveIn * 1000 + amountInWithFee;
+        return numerator / denominator;
     }
 }

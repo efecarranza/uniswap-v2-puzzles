@@ -12,6 +12,7 @@ contract ExactSwapTest is Test {
     address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
 
         exactSwap = new ExactSwap();
@@ -21,12 +22,13 @@ contract ExactSwapTest is Test {
     }
 
     function test_PerformExactSwap() public {
-        (uint256 r0, uint256 r1,) = IUniswapV2Pair(pool).getReserves();
+        (uint256 r0, uint256 r1, ) = IUniswapV2Pair(pool).getReserves();
 
         vm.prank(address(0xb0b));
         exactSwap.performExactSwap(pool, weth, usdc);
 
-        uint256 foo = (1 ether) - (IUniswapV2Pair(weth).balanceOf(address(exactSwap)));
+        uint256 foo = (1 ether) -
+            (IUniswapV2Pair(weth).balanceOf(address(exactSwap)));
 
         uint256 d = (foo * 997 * r0) / ((r1 * 1000) + (997 * foo));
 

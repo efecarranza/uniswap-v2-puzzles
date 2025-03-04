@@ -11,9 +11,12 @@ contract ExactSwapTest is Test {
     address public usdc = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
 
-        exactSwapWithRouter = new ExactSwapWithRouter(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        exactSwapWithRouter = new ExactSwapWithRouter(
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        );
 
         // transfers 1 WETH to exactSwapWithRouter contract
         deal(weth, address(exactSwapWithRouter), 1 ether);
@@ -25,7 +28,9 @@ contract ExactSwapTest is Test {
         vm.prank(address(0xb0b));
         exactSwapWithRouter.performExactSwapWithRouter(weth, usdc, deadline);
 
-        uint256 puzzleBal = IERC20(usdc).balanceOf(address(exactSwapWithRouter));
+        uint256 puzzleBal = IERC20(usdc).balanceOf(
+            address(exactSwapWithRouter)
+        );
 
         require(puzzleBal / 1e6 == 1337, "Puzzle Balance Not 1337 USDC.");
     }

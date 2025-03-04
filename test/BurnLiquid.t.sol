@@ -12,6 +12,7 @@ contract BurnLiquidTest is Test {
     address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
 
         burnLiquid = new BurnLiquid();
@@ -28,6 +29,10 @@ contract BurnLiquidTest is Test {
         uint256 wethBal = IUniswapV2Pair(weth).balanceOf(address(burnLiquid));
 
         assertEq(usdcBal, 1432558576085, "Incorrect USDC tokens received");
-        assertEq(wethBal, 388231892770818155977, "Incorrect WETH tokens received");
+        assertEq(
+            wethBal,
+            388231892770818155977,
+            "Incorrect WETH tokens received"
+        );
     }
 }

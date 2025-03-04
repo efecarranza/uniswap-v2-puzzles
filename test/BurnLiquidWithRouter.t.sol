@@ -14,6 +14,7 @@ contract BurnLiquidWithRouterTest is Test {
     address public router = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
 
         burnLiquidWithRouterAddress = new BurnLiquidWithRouter(router);
@@ -26,12 +27,25 @@ contract BurnLiquidWithRouterTest is Test {
         uint256 deadline = block.timestamp + 1 minutes;
 
         vm.prank(address(0xb0b));
-        burnLiquidWithRouterAddress.burnLiquidityWithRouter(pool, usdc, weth, deadline);
+        burnLiquidWithRouterAddress.burnLiquidityWithRouter(
+            pool,
+            usdc,
+            weth,
+            deadline
+        );
 
-        uint256 usdcBal = IUniswapV2Pair(usdc).balanceOf(address(burnLiquidWithRouterAddress));
-        uint256 wethBal = IUniswapV2Pair(weth).balanceOf(address(burnLiquidWithRouterAddress));
+        uint256 usdcBal = IUniswapV2Pair(usdc).balanceOf(
+            address(burnLiquidWithRouterAddress)
+        );
+        uint256 wethBal = IUniswapV2Pair(weth).balanceOf(
+            address(burnLiquidWithRouterAddress)
+        );
 
         assertEq(usdcBal, 1432558576085, "Incorrect USDC tokens received");
-        assertEq(wethBal, 388231892770818155977, "Incorrect WETH tokens received");
+        assertEq(
+            wethBal,
+            388231892770818155977,
+            "Incorrect WETH tokens received"
+        );
     }
 }

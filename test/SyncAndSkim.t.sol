@@ -16,8 +16,10 @@ contract SyncAndSkimTest is Test {
     uint256 r1;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
         vm.rollFork(20055371);
-        (r0, r1,) = IUniswapV2Pair(pool).getReserves();
+
+        (r0, r1, ) = IUniswapV2Pair(pool).getReserves();
     }
 
     function test_PerformSync() public {
@@ -34,7 +36,7 @@ contract SyncAndSkimTest is Test {
         uint256 wethBal = IUniswapV2Pair(weth).balanceOf(pool);
         uint256 amplBal = IUniswapV2Pair(ampl).balanceOf(pool);
 
-        (uint256 r00, uint256 r11,) = IUniswapV2Pair(pool).getReserves();
+        (uint256 r00, uint256 r11, ) = IUniswapV2Pair(pool).getReserves();
 
         require(wethBal == r00 && amplBal == r11, "Sync Failed.");
     }
@@ -43,11 +45,13 @@ contract SyncAndSkimTest is Test {
         skim = new Skim();
 
         // Deal 0xBeeb with some tokens
-        deal(ampl, address(0xBeeb), 2500e9);
-        deal(weth, address(0xBeeb), 100 ether);
+        deal(weth, address(this), 100 ether);
+        vm.startPrank(0xEDB171C18cE90B633DB442f2A6F72874093b49Ef);
+        IUniswapV2Pair(ampl).transfer(address(this), 2500e9);
+        vm.stopPrank();
 
         // simulate positive rebase
-        vm.startPrank(address(0xBeeb));
+        vm.startPrank(address(this));
         IUniswapV2Pair(weth).transfer(pool, 100 ether);
         IUniswapV2Pair(ampl).transfer(pool, 2500e9);
         vm.stopPrank();
@@ -62,6 +66,9 @@ contract SyncAndSkimTest is Test {
         uint256 wethPuzzleBal = IUniswapV2Pair(weth).balanceOf(address(skim));
         uint256 amplPuzzleBal = IUniswapV2Pair(ampl).balanceOf(address(skim));
 
-        require(wethPuzzleBal > 0 && amplPuzzleBal > 0, "Pool Differences Not Sent To Skim Contract.");
+        require(
+            wethPuzzleBal > 0 && amplPuzzleBal > 0,
+            "Pool Differences Not Sent To Skim Contract."
+        );
     }
 }

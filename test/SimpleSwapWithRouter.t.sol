@@ -12,7 +12,10 @@ contract SimpleSwapWithRouterTest is Test {
     address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
 
     function setUp() public {
-        simpleSwapWithRouter = new SimpleSwapWithRouter(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 21795025);
+        simpleSwapWithRouter = new SimpleSwapWithRouter(
+            0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D
+        );
 
         // transfers 1 ETH to simpleSwapWithRouter contract
         vm.deal(address(simpleSwapWithRouter), 1 ether);
@@ -28,7 +31,9 @@ contract SimpleSwapWithRouterTest is Test {
         vm.prank(address(0xb0b));
         simpleSwapWithRouter.performSwapWithRouter(path, deadline);
 
-        uint256 puzzleBal = IUniswapV2Pair(usdc).balanceOf(address(simpleSwapWithRouter));
+        uint256 puzzleBal = IUniswapV2Pair(usdc).balanceOf(
+            address(simpleSwapWithRouter)
+        );
         require(puzzleBal > 0, "Swap Failed.");
     }
 }

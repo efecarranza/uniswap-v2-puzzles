@@ -12,6 +12,7 @@ contract SimpleSwapTest is Test {
     address public pool = 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 21795025);
         simpleSwap = new SimpleSwap();
 
         // transfers 1 WETH to simpleSwap contract

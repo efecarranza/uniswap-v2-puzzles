@@ -13,6 +13,8 @@ contract SandwichSwapTest is Test {
     address public router = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
     function setUp() public {
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 21795025);
+
         attacker = new Attacker();
         victim = new Victim(router);
 
