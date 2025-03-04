@@ -15,7 +15,7 @@ contract MultiHopTest is Test {
     address public elon = 0x761D38e5ddf6ccf6Cf7c55759d5210750B5D60F3;
 
     function setUp() public {
-        vm.rollFork(20055371);
+        vm.createSelectFork(vm.rpcUrl("mainnet"), 20055371);
 
         multiHop = new MultiHop(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
 

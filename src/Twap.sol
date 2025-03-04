@@ -37,25 +37,64 @@ contract Twap {
 
     //**       ONE HOUR TWAP START      **//
     function first1HourSnapShot() public {
-        // your code here
+        (, , uint32 lastSnapshotTime) = pool.getReserves();
+        first1HourSnapShot_TimeStamp = lastSnapshotTime;
+        first1HourSnapShot_Price0Cumulative = pool.price0CumulativeLast();
     }
 
-    function second1HourSnapShot() public returns (uint224 oneHourTwap) {
-        // your code here
+    function second1HourSnapShot() public view returns (uint224) {
+        (, , uint32 lastSnapshotTime) = pool.getReserves();
 
-        return oneHourTwap;
+        uint256 recentPriceCumul = pool.price0CumulativeLast();
+        uint256 twap;
+
+        unchecked {
+            twap =
+                (recentPriceCumul - first1HourSnapShot_Price0Cumulative) /
+                getTimeElapsed(lastSnapshotTime, first1HourSnapShot_TimeStamp);
+        }
+
+        return uint224(twap);
     }
+
     //**       ONE HOUR TWAP END      **//
 
     //**       ONE DAY TWAP START      **//
     function first1DaySnapShot() public {
-        // your code here
+        (, , uint32 lastSnapshotTime) = pool.getReserves();
+        first1DaySnapShot_TimeStamp = lastSnapshotTime;
+        first1DaySnapShot_Price0Cumulative = pool.price0CumulativeLast();
     }
 
-    function second1DaySnapShot() public returns (uint224 oneDayTwap) {
-        // your code here
+    function second1DaySnapShot() public view returns (uint224) {
+        (, , uint32 lastSnapshotTime) = pool.getReserves();
 
-        return (oneDayTwap);
+        require(
+            getTimeElapsed(lastSnapshotTime, first1HourSnapShot_TimeStamp) >=
+                1 days,
+            "snapshot is not stale"
+        );
+
+        uint256 recentPriceCumul = pool.price0CumulativeLast();
+        uint256 twap;
+
+        unchecked {
+            twap =
+                (recentPriceCumul - first1DaySnapShot_Price0Cumulative) /
+                getTimeElapsed(lastSnapshotTime, first1DaySnapShot_TimeStamp);
+        }
+
+        return uint224(twap);
     }
+
     //**       ONE DAY TWAP END      **//
+
+    function getTimeElapsed(
+        uint32 currentTime,
+        uint32 snapshotTime
+    ) internal pure returns (uint32) {
+        unchecked {
+            return currentTime - snapshotTime;
+        }
+    }
 }
